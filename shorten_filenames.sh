@@ -47,8 +47,8 @@ for FILE in *; do
       # Remove os primeiros N caracteres
       NEW_BASENAME="${BASENAME:$QUANTITY}"
     elif [ "$DIRECTION" == "fim" ]; then
-      # Remove os últimos N caracteres
-      NEW_BASENAME="${BASENAME:0:-$QUANTITY}"
+      # Remove os últimos N caracteres sem afetar a extensão
+      NEW_BASENAME="${BASENAME:0:$((${#BASENAME} - $QUANTITY))}"
     fi
 
     # Renomeia o arquivo adicionando a extensão
