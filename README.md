@@ -11,7 +11,7 @@ This repository contains three Bash scripts designed to help with various file m
      ./file_extension.sh
      ```
    
-   - **Manual:** [File Extension Renamer Script Manual](#MManual%20:%20File%20Renamer%20Script)
+   - **Manual:** [File Extension Renamer Script Manual](#Manual%20%3A%20Remove%20Words%20from%20Filenames%20Script)
 
 2. **Shorten Filenames Script (`shorten_filenames.sh`)**
    - **Description:** This script allows you to shorten filenames by removing a specified number of characters from the beginning or the end of the filenames in the current directory, without affecting their extensions.
