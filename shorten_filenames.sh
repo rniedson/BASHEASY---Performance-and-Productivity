@@ -1,7 +1,33 @@
 #!/bin/bash
 
-# Define o comprimento máximo permitido para o nome do arquivo (sem contar a extensão)
-MAX_LENGTH=20
+# Função de ajuda para exibir como usar o script
+function usage() {
+  echo "Uso: $0 -d <inicio|fim> -n <quantidade>"
+  exit 1
+}
+
+# Verifica se o número de argumentos é suficiente
+if [ $# -lt 4 ]; then
+  usage
+fi
+
+# Processa os argumentos
+while getopts "d:n:" opt; do
+  case $opt in
+    d) DIRECTION="$OPTARG" ;;
+    n) QUANTITY="$OPTARG" ;;
+    *) usage ;;
+  esac
+done
+
+# Verifica se os argumentos são válidos
+if [[ "$DIRECTION" != "inicio" && "$DIRECTION" != "fim" ]]; then
+  usage
+fi
+
+if ! [[ "$QUANTITY" =~ ^[0-9]+$ ]]; then
+  usage
+fi
 
 # Diretório com os arquivos (diretório atual)
 DIR="."
@@ -16,13 +42,16 @@ for FILE in *; do
     EXT="${FILE##*.}"
     # Obtém o nome do arquivo sem a extensão
     BASENAME="${FILE%.*}"
-    
-    # Verifica se o comprimento do nome do arquivo é maior que o permitido
-    if [ ${#BASENAME} -gt $MAX_LENGTH ]; then
-      # Trunca o nome do arquivo para o comprimento máximo permitido
-      NEW_BASENAME="${BASENAME:0:$MAX_LENGTH}"
-      # Renomeia o arquivo com o novo nome truncado e mantém a extensão
-      mv "$FILE" "$NEW_BASENAME.$EXT"
+
+    if [ "$DIRECTION" == "inicio" ]; then
+      # Remove os primeiros N caracteres
+      NEW_BASENAME="${BASENAME:$QUANTITY}"
+    elif [ "$DIRECTION" == "fim" ]; then
+      # Remove os últimos N caracteres
+      NEW_BASENAME="${BASENAME:0:-$QUANTITY}"
     fi
+
+    # Renomeia o arquivo adicionando a extensão
+    mv "$FILE" "$NEW_BASENAME.$EXT"
   fi
 done
