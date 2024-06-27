@@ -32,12 +32,15 @@ fi
 # Diretório com os arquivos (diretório atual)
 DIR="."
 
+# Obtém o nome do script para evitar renomeá-lo
+SCRIPT_NAME=$(basename "$0")
+
 # Navega para o diretório especificado (nesse caso, o diretório atual)
 cd "$DIR" || exit
 
 # Loop através de todos os arquivos no diretório
 for FILE in *; do
-  if [ -f "$FILE" ]; then
+  if [ -f "$FILE" ] && [ "$FILE" != "$SCRIPT_NAME" ]; then
     # Obtém a extensão do arquivo
     EXT="${FILE##*.}"
     # Obtém o nome do arquivo sem a extensão
@@ -48,7 +51,12 @@ for FILE in *; do
       NEW_BASENAME="${BASENAME:$QUANTITY}"
     elif [ "$DIRECTION" == "fim" ]; then
       # Remove os últimos N caracteres sem afetar a extensão
-      NEW_BASENAME="${BASENAME:0:$((${#BASENAME} - $QUANTITY))}"
+      LEN=${#BASENAME}
+      if [ $QUANTITY -ge $LEN ]; then
+        NEW_BASENAME=""
+      else
+        NEW_BASENAME="${BASENAME:0:$(($LEN - $QUANTITY))}"
+      fi
     fi
 
     # Renomeia o arquivo adicionando a extensão
