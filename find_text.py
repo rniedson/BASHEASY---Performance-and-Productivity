@@ -2,7 +2,7 @@ import os
 import re
 
 # Caminho para a pasta onde os arquivos foram extraídos
-extracted_folder_path = 'TicTacToe-V2-master'
+extracted_folder_path = '.'
 
 # Função para buscar a string dentro dos arquivos
 def search_string_in_files(search_string, folder_path):
