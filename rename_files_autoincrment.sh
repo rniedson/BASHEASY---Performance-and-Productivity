@@ -1,22 +1,24 @@
 #!/bin/bash
 
-# Verificar se um diretório e um prefixo foram fornecidos como argumentos
-if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Por favor, forneça o diretório e o prefixo como argumentos."
-    echo "Uso: $0 <diretório> <prefixo>"
-    exit 1
-fi
-
 # Nome do próprio script
 script_name=$(basename "$0")
+
+# Verificar se um diretório foi fornecido como argumento, caso contrário, usar o diretório atual
+if [ -z "$1" ]; then
+    echo "Atenção: Nenhum diretório foi fornecido. O diretório atual será usado e os arquivos neste diretório serão renomeados."
+    directory="."
+else
+    directory="$1"
+fi
+
+# Verificar se um prefixo foi fornecido
+prefix="$2"
+
 echo "Nome do script: $script_name"
+echo "Diretório em uso: $(cd "$directory" && pwd)"
 
 # Mudar para o diretório fornecido
-cd "$1" || exit
-echo "Diretório atual: $(pwd)"
-
-# Prefixo para os novos nomes de arquivos
-prefix="$2"
+cd "$directory" || exit
 
 # Obter uma lista de extensões únicas no diretório
 extensoes=$(find . -maxdepth 1 -type f | sed -n 's/.*\.//p' | sort | uniq)
@@ -29,7 +31,7 @@ for ext in $extensoes; do
     counter=1
 
     # Encontrar todos os arquivos com a extensão atual, ordenar pela data de modificação (do mais antigo para o mais novo)
-    for file in $(find . -maxdepth 1 -type f -name "*.$ext" -exec stat -f "%m %N" {} + | sort -n | awk '{print $2}'); do
+    find . -maxdepth 1 -type f -name "*.$ext" -print0 | while IFS= read -r -d '' file; do
         # Obter o nome base do arquivo
         base_name=$(basename "$file")
 
@@ -40,11 +42,16 @@ for ext in $extensoes; do
         fi
 
         # Construir o novo nome do arquivo
-        new_name="${prefix}$(printf "%03d" $counter).${ext}"
-        echo "Renomeando $base_name para $new_name"
+        if [ -n "$prefix" ]; then
+            new_name="${prefix}$(printf "%03d" $counter).${ext}"
+        else
+            new_name="$(printf "%02d" $counter).${ext}"
+        fi
+
+        echo "Renomeando '$base_name' para '$new_name'"
 
         # Renomear o arquivo
-        mv "$file" "$new_name" && echo "Arquivo $base_name renomeado para $new_name" || echo "Falha ao renomear $base_name"
+        mv "$file" "$new_name" && echo "Arquivo '$base_name' renomeado para '$new_name'" || echo "Falha ao renomear '$base_name'"
 
         # Incrementar o contador
         counter=$((counter + 1))
